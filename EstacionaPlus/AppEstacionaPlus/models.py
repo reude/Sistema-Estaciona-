@@ -5,14 +5,14 @@ from django.utils import timezone
 class A_Funcionario(models.Model):
     nome = models.CharField(max_length=100)
     cpf = models.CharField(max_length=11, unique=True)
-    telefone = models.CharField(max_length=15)
+    telefone = models.CharField(max_length=11)
     email = models.EmailField()
     numero_identificacao = models.CharField(max_length=10, unique=True)
     turno = models.CharField(max_length=50)
     salario = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f'{self.nome} - {self.numero_identificacao}'
+        return f'Funcionário: {self.nome} - {self.numero_identificacao}'
 
     def cadastrar_veiculo(self):
         pass
@@ -31,7 +31,7 @@ class B_Cliente(models.Model):
     email = models.EmailField()
 
     def __str__(self):
-        return self.nome
+        return f'Cliente: {self.nome} - CPF: {self.cpf}'
 
     def registrar_cliente(self):
         pass
@@ -41,14 +41,19 @@ class B_Cliente(models.Model):
 
 # Veículo
 class C_Veiculo(models.Model):
+    TIPO_VEICULO = [
+        ('carro', 'Carro'),
+        ('moto', 'Moto'),
+    ]
     placa = models.CharField(max_length=7, unique=True)
     modelo = models.CharField(max_length=50)
     cor = models.CharField(max_length=30)
-    tipo = models.CharField(max_length=30)
+    tipo = models.CharField(choices=TIPO_VEICULO)
     cliente = models.ForeignKey(B_Cliente, on_delete=models.SET_NULL, null=True)  
 
     def __str__(self):
-        return f'{self.modelo} ({self.placa})'
+        cliente_nome = self.cliente.nome if self.cliente else "Sem cliente"
+        return f'Cliente: {cliente_nome} - {self.modelo} ({self.placa})'
 
     def registrar_entrada(self):
         pass

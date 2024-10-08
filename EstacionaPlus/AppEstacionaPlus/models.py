@@ -1,97 +1,92 @@
-from django.db import models
-from django.utils import timezone
-from stdimage import StdImageField
-from django.utils.translation import gettext_lazy as _
-import os
 import uuid
-from uuid import uuid4
+import requests
+from django.db.models import Sum
+from django.db import models
+from stdimage.models import StdImageField
+from django.utils.translation import gettext_lazy as _
+import random
+from datetime import date, timedelta
 
-def get_file_path(instance, filename):
+
+def get_file_path(_instance, filename):
     ext = filename.split('.')[-1]
-    filename = f'{uuid4()}.{ext}'
-    return os.path.join('funcionarios', filename)
+    filename = f'{uuid.uuid4()}.{ext}'
+    return filename
 
-class A_Funcionario(models.Model):
+#Funcionario
+class Funcionario(models.Model):
     TURNO = [
         ('Manhã', 'Manhã'),
         ('Tarde', 'Tarde'),
         ('Noite', 'Noite'),
     ]
-    nome = models.CharField(max_length=100)
-    cpf = models.CharField(max_length=11, unique=True)
-    telefone = models.CharField(max_length=11)
-    email = models.EmailField()
-    numero_identificacao = models.CharField(max_length=8, unique=True)
-    turno = models.CharField(choices=TURNO, max_length=5)  # Adicionado max_length
-    salario = models.DecimalField(max_digits=10, decimal_places=2)
+    nome = models.CharField(_('Nome'),max_length=100)
+    CPF = models.CharField(_('CPF'), max_length=11, unique=True)
+    telefone = models.CharField(_('Telefone'), max_length=11, blank=True, null=True)
+    email = models.EmailField(_('E-Mail'), blank=True, null=True)
+    numero_identificacao = models.AutoField(primary_key=True, unique=True, editable=False)
+    turno = models.CharField(_('Turno'),choices=TURNO, max_length=5)
+    salario = models.DecimalField(_('Salario'), max_digits=10, decimal_places=2)
     foto = StdImageField(_('Foto'), null=True, blank=True, upload_to=get_file_path, variations={'thumb': {'width': 480, 'height': 480, 'crop': True}})
 
     def __str__(self):
         return f'Funcionário(a): {self.nome} - {self.numero_identificacao}'
 
-    def cadastrar_veiculo(self):
-        pass
-
-    def registrar_entrada(self):
-        pass
-
-    def registrar_saida(self):
-        pass
+    class Meta:
+        verbose_name = _('Funcionario')
+        verbose_name_plural = _('Funcionarios')
 
 # Cliente
-class B_Cliente(models.Model):
-    nome = models.CharField(max_length=100)
-    cpf = models.CharField(max_length=11, unique=True)
-    telefone = models.CharField(max_length=15)
-    email = models.EmailField()
+class Cliente(models.Model):
+    nome = models.CharField(_('Nome'),max_length=100)
+    CPF = models.CharField(_('CPF'), max_length=11, unique=True, primary_key=True)
+    telefone = models.CharField(_('Telefone'), max_length=11, blank=True, null=True)
+    email = models.EmailField(_('E-Mail'), blank=True, null=True)
 
     def __str__(self):
-        return f'Cliente: {self.nome} - CPF: {self.cpf}'
-
-    def registrar_cliente(self):
-        pass
-
-    def atualizar_dados(self):
-        pass
+        return f'Cliente: {self.nome} - CPF: {self.CPF}'
+    
+    class Meta:
+        verbose_name = _('Cliente')
+        verbose_name_plural = _('Clientes')
 
 # Veículo
-class C_Veiculo(models.Model):
+class Veiculo(models.Model):
     TIPO_VEICULO = [
         ('Carro', 'Carro'),
         ('Moto', 'Moto'),
     ]
-    placa = models.CharField(max_length=7, unique=True)
-    modelo = models.CharField(max_length=50)
-    cor = models.CharField(max_length=30)
-    tipo = models.CharField(choices=TIPO_VEICULO)
-    cliente = models.ForeignKey(B_Cliente, on_delete=models.SET_NULL, null=True)  
+    placa = models.CharField(_('Placa'),max_length=7, unique=True, primary_key=True)
+    modelo = models.CharField(_('Modelo'),max_length=50)
+    cor = models.CharField(_('Cor'),max_length=30)
+    tipo = models.CharField(_('Tipo'),choices=TIPO_VEICULO)
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True)  
 
     def __str__(self):
-        cliente_nome = self.cliente.nome if self.cliente else "Sem cliente"
+        cliente_nome = self.cliente.nome
         return f'Cliente: {cliente_nome} - {self.modelo} ({self.placa})'
-
-    def registrar_entrada(self):
-        pass
-
-    def registrar_saida(self):
-        pass
+    
+    class Meta:
+        verbose_name = _('Veiculo')
+        verbose_name_plural = _('Veiculos')
 
 # EntradaVeículo
-class D_EntradaVeiculo(models.Model):
-    data_entrada = models.DateField(default=timezone.now) 
-    hora_entrada = models.TimeField(default=timezone.now) 
-    veiculo = models.ForeignKey(C_Veiculo, on_delete=models.CASCADE)
-    funcionario = models.ForeignKey(A_Funcionario, on_delete=models.CASCADE)
+class Entrada(models.Model):
+    dataHora = models.DateTimeField(_('Data e Hora'), auto_now_add=True)
+    veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE)
+    funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
+    
+    class Meta:
+        verbose_name = _('Entrada')
+        verbose_name_plural = _('Entradas')
 
-    def registrar_entrada(self):
-        pass
 
 # SaidaVeículo
-class E_SaidaVeiculo(models.Model):
-    data_saida = models.DateField(default=timezone.now)  
-    hora_saida = models.TimeField(default=timezone.now)  
-    veiculo = models.ForeignKey(C_Veiculo, on_delete=models.CASCADE)
-    funcionario = models.ForeignKey(A_Funcionario, on_delete=models.CASCADE)
+class Saida(models.Model):
+    dataHora = models.DateTimeField(_('Data e Hora'), auto_now_add=True)
+    veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE)
+    funcionario = models.ForeignKey(Funcionario, on_delete=models.CASCADE)
 
-    def registrar_saida(self):
-        pass
+    class Meta:
+        verbose_name = _('Saida')
+        verbose_name_plural = _('Saidas')

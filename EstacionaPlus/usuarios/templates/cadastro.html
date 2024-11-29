@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .navbar-brand span {
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+        .form-container {
+          max-width: 400px;
+          margin: 50px auto;
+          padding: 20px;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          background-color: #f9f9f9;
+        }
+        .text-danger {
+          font-size: 0.9rem;
+        }
+      </style>
+    <title>Cadastre-se</title>
+  </head>
+  <body class="text-center">
+
+    <!-- Cabeçalho -->
+    <header>
+      <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <a href="{% url 'login' %}" class="navbar-brand d-flex align-items-center">
+              <img src="https://cdn-icons-png.flaticon.com/512/3069/3069647.png" alt="" width="50" height="50" class="me-2">
+              <span>EstacionaPlus</span>
+            </a>
+          </div>
+
+          <div>
+            <a href="{% url 'login' %}"><button type="button" class="btn btn-outline-dark">Login</button></a>
+            <button type="button" class="btn btn-dark" disabled>Cadastre-se</button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+        <div class="form-container">
+          <form method="post" action="{% url 'cadastro' %}">
+            {% csrf_token %}
+            <img class="mb-4" src="https://cdn-icons-png.flaticon.com/512/3069/3069647.png" alt="" width="72" height="72">
+            <h1 class="h3 mb-3 font-weight-normal">Cadastre-se!</h1>
+            
+            <div>
+                <style>
+                    h5 {
+                        font-size: 15px;
+                    }
+                    .success {
+                        color: #00FF00;
+                    }
+                    .error {
+                        color: red;
+                    }
+                </style>
+            
+                {% for message in messages %}
+                    <h5 class="{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% endif %}">
+                        {{ message }}
+                    </h5>
+                {% endfor %}
+            
+                {% if redirect %}
+                    <script type="text/javascript">
+                        setTimeout(function(){
+                            window.location.href = "{% url 'login' %}";
+                        }, 1500);
+                    </script>
+                {% endif %}
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" name="username" id="inputName" class="form-control" placeholder="Nome de usuário" required value="{{ username }}">
+                <label for="inputName">Nome de usuário</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="email" name="email" id="inputEmail" class="form-control" placeholder="name@example.com" required value="{{ email }}">
+                <label for="inputEmail">Endereço de E-mail</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" name="senha" id="inputPassword" class="form-control" placeholder="Senha" required>
+                <label for="inputPassword">Senha</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" name="confirmar_senha" id="inputConfirmarPassword" class="form-control" placeholder="Confirmar Senha" required>
+                <label for="inputConfirmarPassword">Confirmar Senha</label>
+            </div>
+
+            <p class="mt-3">
+                <small>Já tem uma conta? <a href="{% url 'login' %}" class="text-decoration-none">Faça login aqui!</a></small>
+            </p>
+
+            <button class="btn btn-primary w-100" type="submit">Cadastrar</button>
+            <p class="mt-3 mb-3 text-muted">©2024 EstacionaPlus</p>
+            </form>
+        </div>
+    </main>
+
+      
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-c1Xab7RRJ3SoR2Xt9mT3Ka8kVEmIQ6mKYiJ36m/wQa4coTZ1mVdUkaTAI8xWvCZW" crossorigin="anonymous"></script>
+  </body>
+</html>

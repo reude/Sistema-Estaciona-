@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>EstacionaPlus</title>
+    <style>
+      .navbar-brand span {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+      .form-container {
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .message.success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+  </head>
+  
+  <body class="text-center">
+    <!-- Cabeçalho -->
+
+    <header>
+        <nav class="navbar navbar-light bg-light">
+          <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <a href="{% url 'login' %}" class="navbar-brand d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/3069/3069647.png" alt="" width="50" height="50" class="me-2">
+                <span>EstacionaPlus</span>
+              </a>
+            </div>
+  
+            <div>
+              <a href="{% url 'login' %}"><button type="button" class="btn btn-outline-dark">Login</button></a>
+              <button type="button" class="btn btn-dark" disabled>Cadastre-se</button>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+    <h1>EstacionaPlus</h1>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <h2>Registrar Entrada/Saída</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label for="veiculo">Escolha o Veículo:</label>
+            <select name="veiculo" id="veiculo" required>
+                {% for carro in carros %}
+                    <option value="{{ carro.placa }}">{{ carro.modelo }} - {{ carro.placa }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="data_entrada">Data e Hora de Entrada:</label>
+            <input type="datetime-local" name="data_entrada" id="data_entrada">
+
+            <label for="data_saida">Data e Hora de Saída:</label>
+            <input type="datetime-local" name="data_saida" id="data_saida">
+
+            <button type="submit">Registrar</button>
+        </form>
+    </div>
+</body>
+</html>

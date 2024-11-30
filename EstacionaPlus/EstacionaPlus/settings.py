@@ -83,7 +83,7 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql',
 
-        'NAME': 'EstacionaPlus',
+        'NAME': 'EstacionaPlusV2',
 
         'USER': 'postgres',
 

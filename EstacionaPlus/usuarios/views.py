@@ -1,13 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_django
 from django.contrib.auth.decorators import login_required
 from .models import EntradaSet, SaidaSet, VeiculoSet
-from datetime import datetime
-from django.views.generic import ListView, CreateView
+
 
 def cadastro(request):
     if request.method == "POST":
@@ -18,17 +16,17 @@ def cadastro(request):
 
         has_error = False
 
-        # Verificar se o nome de usuário já existe
+        # Verifica se o nome do usuario ja existe
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Já existe um usuário com esse nome.')
             has_error = True
         
-        # Verificar se o e-mail já existe
+        # Verifica se o e-mail ja existe
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Já existe um usuário com esse e-mail.')
             has_error = True
 
-        # Validando se as senhas coincidem
+        # Verifica se as senhas coincidem
         if senha != confirmar_senha:
             messages.error(request, 'As senhas não coincidem.')
             has_error = True
@@ -66,10 +64,9 @@ def login(request):
 
 @login_required
 def EstacionaPlus(request):
-    # Obtém os veículos e as entradas/saídas relacionadas ao usuário autenticado
     veiculos = VeiculoSet.objects.filter(cliente=request.user)
-    entradas = EntradaSet.objects.filter(veiculo__cliente=request.user)
-    saidas = SaidaSet.objects.filter(veiculo__cliente=request.user)
+    entradas = EntradaSet.objects.filter(usuario=request.user)
+    saidas = SaidaSet.objects.filter(usuario=request.user)
 
     context = {
         'veiculos': veiculos,
@@ -84,16 +81,21 @@ def registrar_entrada(request):
         veiculo_id = request.POST.get('veiculo')
         data_entrada = request.POST.get('data_entrada')
         hora_entrada = request.POST.get('hora_entrada')
-        
+
         try:
             veiculo = VeiculoSet.objects.get(id=veiculo_id)
         except VeiculoSet.DoesNotExist:
             return render(request, 'erro.html', {'mensagem': 'Veículo não encontrado!'})
 
-        EntradaSet.objects.create(veiculo=veiculo, data_entrada=data_entrada, hora_entrada=hora_entrada)
-        return redirect('EstacionaPlus')  # Redirecione para a página principal
+        EntradaSet.objects.create(
+            veiculo=veiculo,
+            usuario=request.user,
+            data_entrada=data_entrada,
+            hora_entrada=hora_entrada
+        )
+        return redirect('EstacionaPlus')
 
-    veiculos = VeiculoSet.objects.filter(publico=True)  # Exibir apenas veículos públicos
+    veiculos = VeiculoSet.objects.filter(publico=True) | VeiculoSet.objects.filter(cliente=request.user)
     return render(request, 'entrada.html', {'veiculos': veiculos})
 
 @login_required
@@ -102,14 +104,19 @@ def registrar_saida(request):
         veiculo_id = request.POST.get('veiculo')
         data_saida = request.POST.get('data_saida')
         hora_saida = request.POST.get('hora_saida')
-        
+
         try:
             veiculo = VeiculoSet.objects.get(id=veiculo_id)
         except VeiculoSet.DoesNotExist:
             return render(request, 'erro.html', {'mensagem': 'Veículo não encontrado!'})
 
-        SaidaSet.objects.create(veiculo=veiculo, data_saida=data_saida, hora_saida=hora_saida)
-        return redirect('EstacionaPlus')  # Redirecione para a página principal
+        SaidaSet.objects.create(
+            veiculo=veiculo,
+            usuario=request.user,
+            data_saida=data_saida,
+            hora_saida=hora_saida
+        )
+        return redirect('EstacionaPlus')
 
-    veiculos = VeiculoSet.objects.filter(publico=True)  # Exibir apenas veículos públicos
+    veiculos = VeiculoSet.objects.filter(publico=True) | VeiculoSet.objects.filter(cliente=request.user)
     return render(request, 'saida.html', {'veiculos': veiculos})

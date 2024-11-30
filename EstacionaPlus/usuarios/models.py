@@ -18,6 +18,7 @@ class VeiculoSet(models.Model):
 
 class EntradaSet(models.Model):
     veiculo = models.ForeignKey(VeiculoSet, on_delete=models.CASCADE, related_name="entradas")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="entradas", null=True, blank=True)
     data_entrada = models.DateField()
     hora_entrada = models.TimeField()
 
@@ -26,8 +27,9 @@ class EntradaSet(models.Model):
 
 class SaidaSet(models.Model):
     veiculo = models.ForeignKey(VeiculoSet, on_delete=models.CASCADE, related_name="saidas")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saidas", null=True, blank=True)
     data_saida = models.DateField()
     hora_saida = models.TimeField()
-
+    
     def __str__(self):
         return f"{self.veiculo.modelo} - {self.data_saida} {self.hora_saida}"

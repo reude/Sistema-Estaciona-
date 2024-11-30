@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_django
 from django.contrib.auth.decorators import login_required
-from AppEstacionaPlus.models import Veiculo, Entrada, Saida
+from .models import EntradaSet, SaidaSet, VeiculoSet
+from datetime import datetime
+from django.views.generic import ListView, CreateView
 
 def cadastro(request):
     if request.method == "POST":
@@ -62,31 +64,52 @@ def login(request):
             return render(request, 'login.html')
 
 
+@login_required
 def EstacionaPlus(request):
-    cliente = request.user
-    carros = Veiculo.objects.filter(cliente__email=cliente.email)
-    if request.method == "POST":
-        # Receber dados do formulário
+    # Obtém os veículos e as entradas/saídas relacionadas ao usuário autenticado
+    veiculos = VeiculoSet.objects.filter(cliente=request.user)
+    entradas = EntradaSet.objects.filter(veiculo__cliente=request.user)
+    saidas = SaidaSet.objects.filter(veiculo__cliente=request.user)
+
+    context = {
+        'veiculos': veiculos,
+        'entradas': entradas,
+        'saidas': saidas,
+    }
+    return render(request, 'EstacionaPlus.html', context)
+
+@login_required
+def registrar_entrada(request):
+    if request.method == 'POST':
         veiculo_id = request.POST.get('veiculo')
-        data_hora_entrada = request.POST.get('data_entrada')
-        data_hora_saida = request.POST.get('data_saida')
-
-        # Validar e salvar a entrada/saída
+        data_entrada = request.POST.get('data_entrada')
+        hora_entrada = request.POST.get('hora_entrada')
+        
         try:
-            veiculo = Veiculo.objects.get(placa=veiculo_id)
-            
-            # Registrar entrada ou saída
-            if data_hora_entrada:
-                Entrada.objects.create(veiculo=veiculo, funcionario=None, dataHora=data_hora_entrada)
-                messages.success(request, 'Entrada registrada com sucesso!')
-            if data_hora_saida:
-                Saida.objects.create(veiculo=veiculo, funcionario=None, dataHora=data_hora_saida)
-                messages.success(request, 'Saída registrada com sucesso!')
-        except Veiculo.DoesNotExist:
-            messages.error(request, 'Veículo não encontrado!')
+            veiculo = VeiculoSet.objects.get(id=veiculo_id)
+        except VeiculoSet.DoesNotExist:
+            return render(request, 'erro.html', {'mensagem': 'Veículo não encontrado!'})
 
-        return redirect('estaciona_plus')
+        EntradaSet.objects.create(veiculo=veiculo, data_entrada=data_entrada, hora_entrada=hora_entrada)
+        return redirect('EstacionaPlus')  # Redirecione para a página principal
 
-    return render(request, 'EstacionaPlus.html', {'carros': carros})
+    veiculos = VeiculoSet.objects.filter(publico=True)  # Exibir apenas veículos públicos
+    return render(request, 'entrada.html', {'veiculos': veiculos})
 
-            
+@login_required
+def registrar_saida(request):
+    if request.method == 'POST':
+        veiculo_id = request.POST.get('veiculo')
+        data_saida = request.POST.get('data_saida')
+        hora_saida = request.POST.get('hora_saida')
+        
+        try:
+            veiculo = VeiculoSet.objects.get(id=veiculo_id)
+        except VeiculoSet.DoesNotExist:
+            return render(request, 'erro.html', {'mensagem': 'Veículo não encontrado!'})
+
+        SaidaSet.objects.create(veiculo=veiculo, data_saida=data_saida, hora_saida=hora_saida)
+        return redirect('EstacionaPlus')  # Redirecione para a página principal
+
+    veiculos = VeiculoSet.objects.filter(publico=True)  # Exibir apenas veículos públicos
+    return render(request, 'saida.html', {'veiculos': veiculos})

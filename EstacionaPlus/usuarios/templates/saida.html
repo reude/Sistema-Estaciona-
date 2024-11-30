@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Registrar Saída</title>
+    <style>
+        .navbar-brand span {
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+        .form-container {
+          max-width: 400px;
+          margin: 50px auto;
+          padding: 20px;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          background-color: #f9f9f9;
+        }
+      </style>
+</head>
+
+
+
+<body>
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar navbar-light bg-light">
+          <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <a href="{% url 'EstacionaPlus' %}" class="navbar-brand d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/3069/3069647.png" alt="" width="50" height="50" class="me-2">
+                <span>EstacionaPlus</span>
+              </a>
+            </div>
+            <div>
+              <a href="{% url 'login' %}"><button type="button" class="btn btn-outline-dark">Logout</button></a>
+            </div>
+          </div>
+        </nav>
+      </header>
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-dark text-white">
+                <h3 class="text-center">Registrar Saída</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="veiculo" class="form-label">Veículo:</label>
+                        <select class="form-select" id="veiculo" name="veiculo" required>
+                            {% if veiculos %}
+                                {% for veiculo in veiculos %}
+                                    <option value="{{ veiculo.id }}">{{ veiculo.modelo }} - {{ veiculo.placa }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option disabled>Nenhum veículo disponível</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="data_saida" class="form-label">Data:</label>
+                        <input type="date" id="data_saida" name="data_saida" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hora_saida" class="form-label">Hora:</label>
+                        <input type="time" id="hora_saida" name="hora_saida" class="form-control" required>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-outline-dark">Registrar</button>
+                        <a href="{% url 'EstacionaPlus' %}" class="btn btn-secondary">Voltar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

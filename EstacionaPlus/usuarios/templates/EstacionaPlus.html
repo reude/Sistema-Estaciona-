@@ -4,95 +4,99 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
     <title>EstacionaPlus</title>
     <style>
-      .navbar-brand span {
-        font-size: 1.5rem;
-        font-weight: bold;
-      }
-      .form-container {
-        max-width: 400px;
-        margin: 50px auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        background-color: #f9f9f9;
-      }
+        .navbar-brand span {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .table-striped tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .bem-vindo {
+            margin-bottom: 65px !important;
+        }
     </style>
 </head>
 <body>
     <!-- Cabeçalho -->
     <header>
-      <nav class="navbar navbar-light bg-light">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center">
-            <a href="{% url 'EstacionaPlus' %}" class="navbar-brand d-flex align-items-center">
-              <img src="https://cdn-icons-png.flaticon.com/512/3069/3069647.png" alt="" width="50" height="50" class="me-2">
-              <span>EstacionaPlus</span>
-            </a>
-          </div>
-          <div>
-            <a href="{% url 'login' %}"><button type="button" class="btn btn-outline-dark">Logout</button></a>
-          </div>
-        </div>
-      </nav>
+        <nav class="navbar navbar-light bg-light">
+            <div class="container-fluid d-flex justify-content-between align-items-center">
+                <a href="{% url 'EstacionaPlus' %}" class="navbar-brand d-flex align-items-center">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3069/3069647.png" alt="" width="50" height="50" class="me-2">
+                    <span>EstacionaPlus</span>
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-outline-dark">Logout</a>
+            </div>
+        </nav>
     </header>
 
     <!-- Conteúdo -->
     <div class="container mt-5">
-      <h1 class="mb-4" style="font-weight: 300; font-size: 2.5rem;">
-          Bem-vindo(a), <b>{{ user.username }}</b>!
-      </h1>
+        <h1 class="mb-4 bem-vindo text-center" style="font-weight: 300; font-size: 2.5rem;">
+            Bem-vindo(a), <b>{{ user.username }}</b>!
+        </h1>
 
         <div class="row">
-            <!-- Tabela de Entradas -->
             <div class="col-md-6">
-                <h2><b>Entradas</b></h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Veículo</th>
-                            <th>Data</th>
-                            <th>Hora</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for entrada in entradas %}
-                        <tr>
-                            <td>{{ entrada.veiculo.modelo }}</td>
-                            <td>{{ entrada.data_entrada }}</td>
-                            <td>{{ entrada.hora_entrada }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <a href="{% url 'registrar_entrada' %}" class="btn btn-outline-primary">Registrar Entrada</a>
+                <div class="card p-4">
+                    <h2 class="mb-3">Entradas</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Veículo</th>
+                                <th>Data</th>
+                                <th>Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entrada in entradas %}
+                            <tr>
+                                <td>{{ entrada.veiculo.modelo }}</td>
+                                <td>{{ entrada.data_entrada }}</td>
+                                <td>{{ entrada.hora_entrada }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <a href="{% url 'registrar_entrada' %}" class="btn btn-outline-primary w-100 mt-3">Registrar Entrada</a>
+                </div>
             </div>
-
-            <!-- Tabela de Saídas -->
             <div class="col-md-6">
-                <h2><b>Saídas</b></h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Veículo</th>
-                            <th>Data</th>
-                            <th>Hora</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for saida in saidas %}
-                        <tr>
-                            <td>{{ saida.veiculo.modelo }}</td>
-                            <td>{{ saida.data_saida }}</td>
-                            <td>{{ saida.hora_saida }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <a href="{% url 'registrar_saida' %}" class="btn btn-outline-primary">Registrar Saída</a>
+                <div class="card p-4">
+                    <h2 class="mb-3">Saídas</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Veículo</th>
+                                <th>Data</th>
+                                <th>Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for saida in saidas %}
+                            <tr>
+                                <td>{{ saida.veiculo.modelo }}</td>
+                                <td>{{ saida.data_saida }}</td>
+                                <td>{{ saida.hora_saida }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <a href="{% url 'registrar_saida' %}" class="btn btn-outline-primary w-100 mt-3">Registrar Saída</a>
+                </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </body>
 </html>
